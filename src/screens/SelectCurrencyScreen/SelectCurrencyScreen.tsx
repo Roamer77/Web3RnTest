@@ -1,3 +1,4 @@
+import {useNavigation, useRoute} from '@react-navigation/native';
 import {useCallback, useEffect, useState} from 'react';
 import {
   FlatList,
@@ -9,20 +10,19 @@ import {
 } from 'react-native';
 import {Currency} from '../../api/useGetAllCurrenciesQuery/GetAllCurrenciesQuery.types';
 import {useGetAllCurrenciesQuery} from '../../api/useGetAllCurrenciesQuery/useGetAllCurrenciesQuery';
-import {styles} from './SelectCurrencyScreen.styles';
-import {ListItem} from './components/ListItem/ListItem';
-import {AMOUNT_ITEMS_ON_PAGE} from './SelectCurrencyScreen.constants';
-import {SearchHeader} from './components/SearchHeader/SearchHeader';
-import {Button} from '../../components/Button/Button';
-import {useNavigation, useRoute} from '@react-navigation/native';
-import {AppScreens} from '../../navigation/AppScreens';
 import {useGetPairsForCurrency} from '../../api/useGetPairsForCurrency/useGetPairsForCurrency';
+import {Button} from '../../components/Button/Button';
+import {OverlayLoader} from '../../components/OverlayLoader/OverlayLoader';
+import {AppScreens} from '../../navigation/AppScreens';
 import {
   CoinPairScreenPropsNavigationProps,
   CreateExchangeScreenNavigationProps,
   SelectCurrencyScreenRouteProps,
 } from '../../navigation/RootNavigation.types';
-import {OverlayLoader} from '../../components/OverlayLoader/OverlayLoader';
+import {AMOUNT_ITEMS_ON_PAGE} from './SelectCurrencyScreen.constants';
+import {styles} from './SelectCurrencyScreen.styles';
+import {ListItem} from './components/ListItem/ListItem';
+import {SearchHeader} from './components/SearchHeader/SearchHeader';
 
 export const SelectCurrencyScreen = () => {
   const {navigate} = useNavigation<
@@ -51,6 +51,18 @@ export const SelectCurrencyScreen = () => {
     !isAvailableCurrencyLoading &&
     allCurrencies &&
     availableCurrency;
+
+  const handleEndReached = useCallback(() => {
+    setCurrentPage(prev => prev + 1);
+  }, []);
+
+  const handleSelectButtonPress = useCallback(() => {
+    // @ts-ignore
+    navigate(params?.goBackToScreen ?? AppScreens.CoinPairScreen, {
+      from: params.currencyType,
+      selectedCurrency,
+    });
+  }, [navigate, params, selectedCurrency]);
 
   useEffect(() => {
     if (isDataReady) {
@@ -86,18 +98,6 @@ export const SelectCurrencyScreen = () => {
     }
   }, [availableCurrencyList, searchCurrency, selectedCurrency]);
 
-  const handleEndReached = useCallback(() => {
-    setCurrentPage(prev => prev + 1);
-  }, []);
-
-  const handleSelectButtonPress = useCallback(() => {
-    // @ts-ignore
-    navigate(params?.goBackToScreen ?? AppScreens.CoinPairScreen, {
-      from: params.currencyType,
-      selectedCurrency,
-    });
-  }, [navigate, params, selectedCurrency]);
-
   return (
     <SafeAreaView style={styles.container}>
       <KeyboardAvoidingView style={styles.keyboardAvoid}>
@@ -107,7 +107,6 @@ export const SelectCurrencyScreen = () => {
               onChangeText={setSearchCurrency}
               searchInput={searchCurrency}
             />
-
             <FlatList
               contentContainerStyle={styles.content}
               data={dataFroRender}

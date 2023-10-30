@@ -10,25 +10,32 @@ import {
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {useCreateExchangeMutation} from '../../api/useCreateExchangeMutation/useCreateExchangeMutation';
-import {Currency} from '../../api/useGetAllCurrenciesQuery/GetAllCurrenciesQuery.types';
 import {Button} from '../../components/Button/Button';
 import {Exchanger} from '../../components/Exchanger/Exchanger';
+import {useExchangerState} from '../../components/Exchanger/hooks/useExchangerState';
 import {WalletAddressInput} from '../../components/WalletAddressInput/WalletAddressInput';
 import {AppScreens} from '../../navigation/AppScreens';
-import {styles} from './CreateExchangeScreen.styles';
 import {
   CreateExchangeScreenRouteProps,
   ExchangeResultScreenNavigationProps,
 } from '../../navigation/RootNavigation.types';
+import {styles} from './CreateExchangeScreen.styles';
 
 export const CreateExchangeScreen = () => {
   const {params} = useRoute<CreateExchangeScreenRouteProps>();
   const {navigate} = useNavigation<ExchangeResultScreenNavigationProps>();
 
-  const [inputAmount, setInputAmount] = useState('');
+  const exchangerState = useExchangerState();
 
-  const [sendCurrency, setSendCurrency] = useState<Currency>();
-  const [getCurrency, setGetCurrency] = useState<Currency>();
+  const {
+    inputAmount,
+    sendCurrency,
+    getCurrency,
+    setInputAmount,
+    setSendCurrency,
+    setGetCurrency,
+  } = exchangerState;
+
   const [userWalletAddress, setUserWalletAddress] = useState('');
   const [userRefundWalletAddress, setRefundWalletAddress] = useState('');
 
@@ -84,7 +91,7 @@ export const CreateExchangeScreen = () => {
       setSendCurrency(initialGetCurrency);
       setGetCurrency(initialSendCurrency);
     }
-  }, [params]);
+  }, [params, setGetCurrency, setInputAmount, setSendCurrency]);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -93,12 +100,7 @@ export const CreateExchangeScreen = () => {
           <View>
             <Text style={styles.title}>Add exchange details</Text>
             <Exchanger
-              inputAmount={inputAmount}
-              sendCurrency={sendCurrency}
-              getCurrency={getCurrency}
-              setInputAmount={setInputAmount}
-              setSendCurrency={setSendCurrency}
-              setGetCurrency={setGetCurrency}
+              {...exchangerState}
               goBackScreen={AppScreens.CreateExchangeScreen}
             />
             <View>
