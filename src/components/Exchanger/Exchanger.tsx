@@ -80,7 +80,6 @@ export const Exchanger = ({
         setGetCurrency(params?.selectedCurrency);
       }
       if (params?.from === 'send') {
-        console.log(params?.selectedCurrency.name);
         setSendCurrency(params?.selectedCurrency);
       }
     }

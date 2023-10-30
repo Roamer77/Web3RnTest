@@ -22,6 +22,7 @@ import {
   CreateExchangeScreenNavigationProps,
   SelectCurrencyScreenRouteProps,
 } from '../../navigation/RootNavigation.types';
+import {OverlayLoader} from '../../components/OverlayLoader/OverlayLoader';
 
 export const SelectCurrencyScreen = () => {
   const {navigate} = useNavigation<
@@ -51,7 +52,6 @@ export const SelectCurrencyScreen = () => {
     allCurrencies &&
     availableCurrency;
 
-  //TODO: think how to reduse renders or may be render all in one time
   useEffect(() => {
     if (isDataReady) {
       const available = allCurrencies.filter(item =>
@@ -132,6 +132,7 @@ export const SelectCurrencyScreen = () => {
                 disabled={!selectedCurrency}
               />
             </View>
+            <OverlayLoader isVisible={!isDataReady} />
           </View>
         </TouchableWithoutFeedback>
       </KeyboardAvoidingView>
